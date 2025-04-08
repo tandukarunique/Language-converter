@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Google Translate</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="http://translate.google.com/translate_a/element.js?cb=loadGoogleTranslate"></script>
+
+    <style>
+      /* Base animations and gradients */
+      .translate-animation {
+        transition: all 0.3s ease;
+      }
+      .translate-animation:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+      .gradient-bg {
+        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+      }
+
+      /* Google Translate Widget Styling */
+      #google_element {
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Style the main widget container */
+      .skiptranslate.goog-te-gadget {
+        font-family: "Inter", sans-serif !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      /* Clean up the widget text */
+      .skiptranslate.goog-te-gadget span {
+        display: none !important;
+      }
+
+      /* Style the language selection dropdown */
+      .goog-te-gadget select.goog-te-combo {
+        width: 100% !important;
+        padding: 0.75rem 1rem !important;
+        border-radius: 0.5rem !important;
+        border: 1px solid #d1d5db !important;
+        font-size: 1rem !important;
+        color: #4b5563 !important;
+        background-color: white !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+        outline: none !important;
+        transition: all 0.2s ease !important;
+        cursor: pointer !important;
+        -webkit-appearance: none !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236366F1'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 0.75rem center !important;
+        background-size: 1.5em 1.5em !important;
+      }
+
+      .goog-te-gadget select.goog-te-combo:hover {
+        border-color: #6366f1 !important;
+      }
+
+      .goog-te-gadget select.goog-te-combo:focus {
+        border-color: #4f46e5 !important;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+      }
+
+      /* Hide the original Google branding */
+      .goog-logo-link,
+      .goog-logo-link:link,
+      .goog-logo-link:visited,
+      .goog-logo-link:hover,
+      .goog-logo-link:active {
+        display: none !important;
+      }
+
+      .goog-te-banner-frame,
+      .goog-te-balloon-frame {
+        display: none !important;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 640px) {
+        .goog-te-gadget select.goog-te-combo {
+          font-size: 0.875rem !important;
+          padding: 0.5rem 0.75rem !important;
+        }
+      }
+
+      /* This removes the automatic Google top bar */
+      body {
+        top: 0 !important;
+      }
+
+      /* Custom language selector label */
+      .language-selector-label {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #4b5563;
+      }
+
+      .language-selector-label i {
+        margin-right: 0.5rem;
+        color: #6366f1;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 text-gray-900 font-sans min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg py-4 md:py-6 shadow-lg">
+      <div class="max-w-5xl mx-auto px-4">
+        <div class="flex items-center justify-center">
+          <i
+            class="fas fa-language text-white text-3xl md:text-4xl mr-3 md:mr-4"
+          ></i>
+          <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-white">
+            Language Translator
+          </h1>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="max-w-5xl mx-auto my-4 md:my-8 px-4">
+      <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+        <!-- Top Section -->
+        <div class="p-4 md:p-6 lg:p-8 border-b border-gray-200">
+          <h2 class="text-xl md:text-2xl font-semibold text-gray-800 mb-2">
+            Translate Your Content
+          </h2>
+          <p class="text-gray-600 text-sm md:text-base">
+            Enter your text below and use the language selector to choose your
+            target language.
+          </p>
+        </div>
+
+        <!-- Translation Section -->
+        <div class="p-4 md:p-6 lg:p-8">
+          <!-- Custom Google Translate widget container -->
+          <div class="mb-6">
+            <div class="language-selector-label">
+              <i class="fas fa-globe"></i>
+              <span>Select Target Language</span>
+            </div>
+            <div
+              id="google_element"
+              class="p-4 bg-gray-50 rounded-lg border border-gray-200"
+            ></div>
+          </div>
+
+          <!-- Input Area -->
+          <div class="mb-6">
+            <label
+              for="userText"
+              class="block text-sm font-medium text-gray-700 mb-2 flex items-center"
+            >
+              <i class="fas fa-pen-alt text-indigo-500 mr-2"></i>
+              Your Text
+            </label>
+            <textarea
+              id="userText"
+              placeholder="Enter text you want to translate..."
+              class="w-full h-28 md:h-32 p-3 md:p-4 border border-gray-300 rounded-lg mb-2 text-base md:text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200"
+            ></textarea>
+            <p class="text-xs md:text-sm text-gray-500">
+              Supports 3 languages and formats
+            </p>
+          </div>
+
+          <!-- Translate Button -->
+          <button
+            onclick="translateText()"
+            class="w-full p-3 md:p-4 gradient-bg text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 translate-animation flex items-center justify-center text-base md:text-lg font-medium"
+          >
+            <i class="fas fa-exchange-alt mr-2"></i>
+            Translate Now
+          </button>
+        </div>
+
+        <!-- Result Section -->
+        <div
+          id="translatedText"
+          class="p-4 md:p-6 lg:p-8 bg-gray-50 border-t border-gray-200 hidden"
+        ></div>
+      </div>
+
+      <!-- Additional Info -->
+      <div class="mt-6 md:mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+        <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
+          <div class="text-indigo-500 mb-2 md:mb-3">
+            <i class="fas fa-globe text-xl md:text-2xl"></i>
+          </div>
+          <h3 class="text-base md:text-lg font-semibold mb-1 md:mb-2">
+            Multiple Languages
+          </h3>
+          <p class="text-sm md:text-base text-gray-600">
+            Translate to and from of multiple languages
+          </p>
+        </div>
+
+        <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
+          <div class="text-indigo-500 mb-2 md:mb-3">
+            <i class="fas fa-bolt text-xl md:text-2xl"></i>
+          </div>
+          <h3 class="text-base md:text-lg font-semibold mb-1 md:mb-2">
+            Fast Translation
+          </h3>
+          <p class="text-sm md:text-base text-gray-600">
+            Get instant results powered by Google's translation technology
+          </p>
+        </div>
+
+        <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
+          <div class="text-indigo-500 mb-2 md:mb-3">
+            <i class="fas fa-mobile-alt text-xl md:text-2xl"></i>
+          </div>
+          <h3 class="text-base md:text-lg font-semibold mb-1 md:mb-2">
+            Mobile Friendly
+          </h3>
+          <p class="text-sm md:text-base text-gray-600">
+            Use on any device with a responsive design
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6 md:py-8 mt-8 md:mt-12">
+      <div class="max-w-5xl mx-auto px-4 text-center">
+        <p class="text-sm md:text-base">
+          © 2025 Language Translator. Powered by Google Translate.
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      function loadGoogleTranslate() {
+        new google.translate.TranslateElement(
+          {
+            pageLanguage: "en",
+            includedLanguages: "en,hi,ne",
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false,
+          },
+          "google_element"
+        );
+
+        // Add a small delay to allow Google Translate to render, then apply extra styling
+        setTimeout(() => {
+          styleGoogleTranslate();
+        }, 300);
+      }
+
+      function styleGoogleTranslate() {
+        // Additional styling can be done here if needed
+        const translateWidget = document.querySelector(".goog-te-gadget");
+        if (translateWidget) {
+          translateWidget.classList.add("custom-translate-widget");
+        }
+      }
+
+      function translateText() {
+        const userInput = document.getElementById("userText").value;
+
+        if (userInput.trim()) {
+          // Display the translation section
+          const translatedTextElement =
+            document.getElementById("translatedText");
+          translatedTextElement.classList.remove("hidden");
+
+          // Display the original text and the translated result
+          translatedTextElement.innerHTML = `
+          <div class="mb-4 md:mb-6">
+            
+            <div class="bg-white p-3 md:p-4 rounded-lg border border-gray-300">
+              <p class="font-medium text-gray-700 mb-2 text-sm md:text-base">Original Text:</p>
+              <p class="text-gray-800 mb-4 p-2 md:p-3 bg-gray-50 rounded text-sm md:text-base">${userInput}</p>
+              
+             
+            </div>
+          </div>
+          <div class="text-center">
+            <button onclick="copyTranslation()" class="px-3 py-2 md:px-4 md:py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 inline-flex items-center text-sm md:text-base">
+              <i class="far fa-copy mr-2"></i> Copy Text
+            </button>
+          </div>
+        `;
+        } else {
+          // Show an elegant error message
+          const translatedTextElement =
+            document.getElementById("translatedText");
+          translatedTextElement.classList.remove("hidden");
+          translatedTextElement.innerHTML = `
+          <div class="flex items-center p-3 md:p-4 bg-red-50 rounded-lg">
+            <i class="fas fa-exclamation-circle text-red-500 text-lg md:text-xl mr-2 md:mr-3"></i>
+            <p class="text-red-700 text-sm md:text-base">Please enter some text to translate.</p>
+          </div>
+        `;
+
+          // Hide the error after 3 seconds
+          setTimeout(() => {
+            translatedTextElement.classList.add("hidden");
+          }, 3000);
+        }
+      }
+
+      function copyTranslation() {
+        const userInput = document.getElementById("userText").value;
+        if (userInput) {
+          navigator.clipboard.writeText(userInput).then(() => {
+            alert("Text copied to clipboard!");
+          });
+        }
+      }
+
+      // Initialize on page load
+      window.addEventListener("load", function () {
+        // Add a small delay before initializing Google Translate to ensure DOM is ready
+        setTimeout(() => {
+          if (typeof google !== "undefined" && google.translate) {
+            loadGoogleTranslate();
+          }
+        }, 100);
+      });
+    </script>
+  </body>
+</html>
